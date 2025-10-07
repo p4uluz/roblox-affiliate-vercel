@@ -1,61 +1,38 @@
 export default async function handler(req, res) {
   try {
-    // Untuk request GET (cek status)
-    if (req.method !== "POST") {
-      return res
-        .status(200)
-        .json({ status: "✅ Roblox Affiliate Webhook Active" });
-    }
+    if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-    // Parsing body agar tidak undefined
-    let data;
-    try {
-      data = typeof req.body === "object" ? req.body : JSON.parse(req.body || "{}");
-    } catch (err) {
-      console.error("Invalid JSON body:", err);
-      return res.status(400).json({ error: "Invalid JSON" });
-    }
+    const webhook = process.env.DISCORD_WEBHOOK;
+    if (!webhook) return res.status(500).json({ error: "Missing DISCORD_WEBHOOK" });
 
-    const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
-    if (!webhookUrl) {
-      console.error("❌ ENV variable DISCORD_WEBHOOK_URL belum diatur!");
-      return res.status(500).json({ error: "Webhook URL not configured" });
-    }
-
-    // Buat embed Discord
+    const data = req.body;
     const embed = {
-      embeds: [
-        {
-          title: "🛍️ Roblox Purchase Detected!",
-          description: `${data.username || "Unknown"} membeli **${data.itemName || "Unknown Item"}**`,
-          color: 0x00ff00,
-          fields: [
-            { name: "💰 Harga", value: `${data.price || 0} Robux`, inline: true },
-            { name: "💸 Cashback (40%)", value: `${data.cashback || 0} Robux`, inline: true },
-            { name: "🏆 Komisi Kamu (10%)", value: `${data.komisi || 0} Robux`, inline: true },
-            { name: "🧍 User ID", value: `${data.userId || "N/A"}`, inline: false },
-          ],
-          timestamp: new Date().toISOString(),
-        },
-      ],
+      username: "💰 Roblox Affiliate Tracker",
+      avatar_url: "https://tr.rbxcdn.com/3b62a0b12efb6a65aa4cb58c4e7dffb3/150/150/Image/Png",
+      embeds: [{
+        title: `🛍️ ${data.username} baru saja beli ${data.itemName}`,
+        color: 0x00ff00,
+        fields: [
+          { name: "💵 Harga", value: `${data.price} R$`, inline: true },
+          { name: "💸 Cashback (40%)", value: `${data.cashback} R$`, inline: true },
+          { name: "🏆 Komisi Kamu (10%)", value: `${data.komisi} R$`, inline: true },
+          { name: "📊 Total Belanja", value: `${data.totalSpent} R$`, inline: true },
+          { name: "💰 Total Cashback", value: `${data.totalCashback} R$`, inline: true },
+          { name: "👑 Total Komisi", value: `${data.totalKomisi} R$`, inline: true },
+        ],
+        footer: { text: "💸 Roblox Affiliate Tracker System" },
+      }]
     };
 
-    // Kirim ke Discord
-    const response = await fetch(webhookUrl, {
+    await fetch(webhook, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(embed),
     });
 
-    if (!response.ok) {
-      const text = await response.text();
-      console.error("❌ Gagal kirim ke Discord:", text);
-      return res.status(500).json({ error: "Failed to send to Discord" });
-    }
-
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ status: "✅ Sent to Discord" });
   } catch (err) {
-    console.error("🔥 Internal error:", err);
-    return res.status(500).json({ error: "Internal Server Error" });
+    console.error(err);
+    return res.status(500).json({ error: "Server error" });
   }
 }
