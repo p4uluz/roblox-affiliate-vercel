@@ -14,11 +14,11 @@ export default async function handler(req, res) {
         color: 0x00ff00,
         fields: [
           { name: "💵 Harga", value: `${data.price} R$`, inline: true },
-          { name: "💸 Cashback (40%)", value: `${data.cashback} R$`, inline: true },
-          { name: "🏆 Komisi Kamu (10%)", value: `${data.komisi} R$`, inline: true },
-          { name: "📊 Total Belanja", value: `${data.totalSpent} R$`, inline: true },
-          { name: "💰 Total Cashback", value: `${data.totalCashback} R$`, inline: true },
-          { name: "👑 Total Komisi", value: `${data.totalKomisi} R$`, inline: true },
+          { name: "💸 Cashback (40%)", value: `${data.cashback} Robux`, inline: true },
+          { name: "🏆 Komisi Kamu (10%)", value: `${data.komisi} Robux`, inline: true },
+          { name: "📊 Total Belanja", value: `${data.totalSpent} Robux`, inline: true },
+          { name: "💰 Total Cashback", value: `${data.totalCashback} Robux`, inline: true },
+          { name: "👑 Total Komisi", value: `${data.totalKomisi} Robux`, inline: true },
         ],
         footer: { text: "💸 Roblox Affiliate Tracker System" },
       }]
