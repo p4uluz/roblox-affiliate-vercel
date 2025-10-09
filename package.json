@@ -1,8 +1,7 @@
 {
   "name": "roblox-affiliate-vercel",
   "version": "1.0.0",
-  "main": "api/roblox.js",
-  "type": "module",
+  "private": true,
   "dependencies": {
     "node-fetch": "^3.3.2"
   }
