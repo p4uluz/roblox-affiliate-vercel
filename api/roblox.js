@@ -1,10 +1,10 @@
-// api/roblox.js
 import fetch from "node-fetch";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   const { username, itemName, price, cashback, totalSpent, totalCashback } = req.body;
+
   const webhook = process.env.DISCORD_WEBHOOK;
   if (!webhook) return res.status(400).json({ error: "Missing DISCORD_WEBHOOK" });
 
