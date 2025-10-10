@@ -1,4 +1,4 @@
-import fetch from "node-fetch"; // kalau pakai node-fetch, jangan lupa package.json ada "type":"module"
+import fetch from "node-fetch";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -8,19 +8,28 @@ export default async function handler(req, res) {
   const data = req.body;
 
   const embed = {
+    username: "💰 Roblox Cashback Tracker", // << ganti nama pengirim di Discord
+    // avatar_url: "https://imgur.com/a/2e2wbti", // (opsional) bisa tambahin logo sendiri
     embeds: [
       {
         title: `🛒 ${data.username} baru saja melakukan pembelian!`,
-        color: 16766720,
+        color: 16766720, // oranye
         fields: [
-          { name: "Item", value: `${data.itemName} (${data.price} Robux)`, inline: false },
-          { name: "Cashback", value: `${data.cashback} Robux`, inline: true },
-          { name: "Total Bulan Ini", value: `${data.totalSpent} Robux`, inline: true },
-          { name: "Cashback Bulan Ini", value: `${data.totalCashback} Robux`, inline: true },
-          { name: "Total All Time", value: `${data.allTimeSpent} Robux`, inline: true },
-          { name: "Cashback All Time", value: `${data.allTimeCashback} Robux`, inline: true }
+          { name: "📦 Item", value: `${data.itemName}`, inline: false },
+          { name: "💰 Harga", value: `${data.price} Robux`, inline: true },
+          { name: "💸 Cashback", value: `${data.cashback} Robux`, inline: true },
+          { 
+            name: "📊 Bulan Ini", 
+            value: `Total: ${data.totalSpent} Robux\nCashback: ${data.totalCashback} Robux`, 
+            inline: false 
+          },
+          { 
+            name: "🌐 All Time", 
+            value: `Total: ${data.allTimeSpent} Robux\nCashback: ${data.allTimeCashback} Robux`, 
+            inline: false 
+          }
         ],
-        footer: { text: `Affiliate Tracker • Periode: ${data.month}` },
+        footer: { text: `Cashback Sistem • Periode: ${data.month}` },
         timestamp: new Date(data.time * 1000).toISOString()
       }
     ]
