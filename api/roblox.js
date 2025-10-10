@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+import fetch from "node-fetch"; // kalau pakai node-fetch, jangan lupa package.json ada "type":"module"
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
