@@ -1,42 +1,71 @@
-// ✅ test.js
-// Jalankan di terminal pakai: node test.js
-// Pastikan Node.js versi 18 ke atas (karena pakai fetch bawaan)
+// ✅ api/test.js
+// Endpoint buat test manual — kirim dummy embed ke Discord
+// Akses dari browser: https://roblox-affiliate-vercel.vercel.app/api/test
 
-// Ganti URL ini kalau project Vercel lo beda
-const ENDPOINT_URL = "https://roblox-affiliate-vercel.vercel.app/api/roblox";
+export default async function handler(req, res) {
+  // Dummy data buat simulasi pembelian
+  const data = {
+    username: "DummyTester",
+    userId: 111111,
+    itemName: "Test Sword",
+    price: 100,
+    cashback: 30,
+    totalSpent: 200,
+    totalCashback: 60,
+    allTimeSpent: 800,
+    allTimeCashback: 240,
+    month: "October 2025",
+    time: Math.floor(Date.now() / 1000)
+  };
 
-// Payload simulasi pembelian Roblox (dummy data)
-const payload = {
-  username: "TesterUser",
-  userId: 999999,
-  itemName: "TEST_DOMINUS",
-  price: 1000,
-  cashback: 300,
-  totalSpent: 4500,
-  totalCashback: 1350,
-  allTimeSpent: 14500,
-  allTimeCashback: 4350,
-  month: "Oktober 2025",
-  time: Math.floor(Date.now() / 1000)
-};
-
-async function testWebhook() {
-  console.log("🚀 Mengirim test payload ke:", ENDPOINT_URL);
-  console.log("📦 Payload:", payload);
+  const embed = {
+    username: "💰 Roblox Cashback Tracker (TEST)",
+    embeds: [
+      {
+        title: `🧪 ${data.username} baru saja melakukan pembelian (TEST)!`,
+        color: 0x2ecc71, // hijau biar beda dari real
+        fields: [
+          { name: "📦 Item", value: `${data.itemName}`, inline: false },
+          { name: "💰 Harga", value: `${data.price} Robux`, inline: true },
+          { name: "💸 Cashback", value: `${data.cashback} Robux`, inline: true },
+          {
+            name: "📊 Bulan Ini",
+            value: `Total: ${data.totalSpent} Robux\nCashback: ${data.totalCashback} Robux`,
+            inline: false
+          },
+          {
+            name: "🌐 All Time",
+            value: `Total: ${data.allTimeSpent} Robux\nCashback: ${data.allTimeCashback} Robux`,
+            inline: false
+          }
+        ],
+        footer: { text: `Cashback Sistem • Periode: ${data.month}` },
+        timestamp: new Date(data.time * 1000).toISOString()
+      }
+    ]
+  };
 
   try {
-    const res = await fetch(ENDPOINT_URL, {
+    const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+    if (!webhookUrl) {
+      return res.status(500).json({ error: "Missing DISCORD_WEBHOOK_URL" });
+    }
+
+    const response = await fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(embed)
     });
 
-    const text = await res.text();
-    console.log("✅ Status:", res.status, res.statusText);
-    console.log("🧾 Response:", text);
+    if (!response.ok) {
+      const txt = await response.text();
+      console.error("Discord error:", txt);
+      return res.status(502).json({ error: "Failed to send to Discord", details: txt });
+    }
+
+    return res.status(200).json({ ok: true, message: "✅ Dummy embed terkirim ke Discord" });
   } catch (err) {
-    console.error("❌ Gagal mengirim request:", err);
+    console.error("Error:", err);
+    return res.status(500).json({ error: "Gagal kirim ke Discord" });
   }
 }
-
-testWebhook();
